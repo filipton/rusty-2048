@@ -9,9 +9,19 @@ fn main() {
     board.board[1][0] = 2;
     board.board[2][0] = 2;
     board.board[3][0] = 2;
+    board.board[0][1] = 2;
+    board.board[0][2] = 2;
+    board.board[0][3] = 2;
 
     board.print_board();
     board.move_right();
+    board.print_board();
+    board.move_left();
+    board.print_board();
+
+    board.move_up();
+    board.print_board();
+    board.move_down();
     board.print_board();
 }
 
@@ -78,7 +88,6 @@ impl BoardData {
                     if self.board[combine_x][y] == 0 {
                         continue;
                     }
-
                     if self.board[combine_x][y] != self.board[block_x][y] {
                         break;
                     }
@@ -86,8 +95,105 @@ impl BoardData {
                     self.board[combine_x][y] = 0;
                     self.board[block_x][y] *= 2;
                 }
+            }
+        }
+    }
 
-                self.print_board();
+    fn move_left(&mut self) {
+        for y in 0..4 {
+            for x in 0..4 {
+                if self.board[x][y] == 0 {
+                    continue;
+                }
+
+                let mut block_x = x;
+                for x2 in (0..x).rev() {
+                    if self.board[x2][y] == 0 {
+                        self.board[x2][y] = self.board[block_x][y];
+                        self.board[block_x][y] = 0;
+                        block_x = x2;
+
+                        continue;
+                    }
+                }
+
+                for combine_x in block_x + 1..4 {
+                    if self.board[combine_x][y] == 0 {
+                        continue;
+                    }
+                    if self.board[combine_x][y] != self.board[block_x][y] {
+                        break;
+                    }
+
+                    self.board[combine_x][y] = 0;
+                    self.board[block_x][y] *= 2;
+                }
+            }
+        }
+    }
+
+    fn move_up(&mut self) {
+        for x in 0..4 {
+            for y in 0..4 {
+                if self.board[x][y] == 0 {
+                    continue;
+                }
+
+                let mut block_y = y;
+                for y2 in (0..y).rev() {
+                    if self.board[x][y2] == 0 {
+                        self.board[x][y2] = self.board[x][block_y];
+                        self.board[x][block_y] = 0;
+                        block_y = y2;
+
+                        continue;
+                    }
+                }
+
+                for combine_y in block_y + 1..4 {
+                    if self.board[x][combine_y] == 0 {
+                        continue;
+                    }
+                    if self.board[x][combine_y] != self.board[x][block_y] {
+                        break;
+                    }
+
+                    self.board[x][combine_y] = 0;
+                    self.board[x][block_y] *= 2;
+                }
+            }
+        }
+    }
+
+    fn move_down(&mut self) {
+        for x in 0..4 {
+            for y in (0..4).rev() {
+                if self.board[x][y] == 0 {
+                    continue;
+                }
+
+                let mut block_y = y;
+                for y2 in (y + 1)..4 {
+                    if self.board[x][y2] == 0 {
+                        self.board[x][y2] = self.board[x][block_y];
+                        self.board[x][block_y] = 0;
+                        block_y = y2;
+
+                        continue;
+                    }
+                }
+
+                for combine_y in (0..block_y).rev() {
+                    if self.board[x][combine_y] == 0 {
+                        continue;
+                    }
+                    if self.board[x][combine_y] != self.board[x][block_y] {
+                        break;
+                    }
+
+                    self.board[x][combine_y] = 0;
+                    self.board[x][block_y] *= 2;
+                }
             }
         }
     }

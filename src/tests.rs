@@ -2,7 +2,6 @@
 mod test {
     use crate::BoardData;
 
-    /*
     #[test]
     fn test_move_horizontal() {
         let mut board = BoardData { board: [[0; 4]; 4] };
@@ -12,7 +11,7 @@ mod test {
         board.board[3][0] = 2;
 
         board.print_board();
-        board.move_horizontal(true);
+        board.move_right();
         board.print_board();
 
         assert_eq!(board.board[0][0], 0);
@@ -20,7 +19,7 @@ mod test {
         assert_eq!(board.board[2][0], 4);
         assert_eq!(board.board[3][0], 4);
 
-        board.move_horizontal(false);
+        board.move_left();
         board.print_board();
 
         assert_eq!(board.board[0][0], 8);
@@ -38,7 +37,7 @@ mod test {
         board.board[3][0] = 0;
 
         board.print_board();
-        board.move_horizontal(false);
+        board.move_left();
         board.print_board();
 
         assert_eq!(board.board[0][0], 4);
@@ -46,7 +45,7 @@ mod test {
         assert_eq!(board.board[2][0], 0);
         assert_eq!(board.board[3][0], 0);
 
-        board.move_horizontal(true);
+        board.move_right();
         board.print_board();
 
         assert_eq!(board.board[0][0], 0);
@@ -64,7 +63,7 @@ mod test {
         board.board[0][3] = 2;
 
         board.print_board();
-        board.move_vertical(true);
+        board.move_down();
         board.print_board();
 
         assert_eq!(board.board[0][0], 0);
@@ -72,7 +71,7 @@ mod test {
         assert_eq!(board.board[0][2], 4);
         assert_eq!(board.board[0][3], 4);
 
-        board.move_vertical(false);
+        board.move_up();
         board.print_board();
 
         assert_eq!(board.board[0][0], 8);
@@ -90,7 +89,7 @@ mod test {
         board.board[0][3] = 0;
 
         board.print_board();
-        board.move_vertical(false);
+        board.move_up();
         board.print_board();
 
         assert_eq!(board.board[0][0], 4);
@@ -98,7 +97,7 @@ mod test {
         assert_eq!(board.board[0][2], 0);
         assert_eq!(board.board[0][3], 0);
 
-        board.move_vertical(true);
+        board.move_down();
         board.print_board();
 
         assert_eq!(board.board[0][0], 0);
@@ -131,16 +130,16 @@ mod test {
         board.board[3][3] = 2;
 
         board.print_board();
-        board.move_horizontal(true);
+        board.move_right();
         board.print_board();
 
-        board.move_vertical(true);
+        board.move_down();
         board.print_board();
 
-        board.move_horizontal(false);
+        board.move_left();
         board.print_board();
 
-        board.move_vertical(false);
+        board.move_up();
         board.print_board();
 
         assert_eq!(board.board[0][0], 32);
@@ -154,5 +153,4 @@ mod test {
 
         assert_eq!(sum, 32);
     }
-    */
 }
