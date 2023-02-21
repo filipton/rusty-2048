@@ -1,18 +1,17 @@
 use rand::Rng;
-use std::collections::VecDeque;
+use std::{borrow::Borrow, collections::VecDeque};
 
 mod tests;
 
 fn main() {
-    let mut board = BoardData::new();
+    let mut board = BoardData { board: [[0; 4]; 4] };
+    board.board[0][0] = 2;
+    board.board[1][0] = 2;
+    board.board[2][0] = 2;
+    board.board[3][0] = 2;
+
     board.print_board();
-    board.move_horizontal(false);
-    board.print_board();
-    board.move_horizontal(true);
-    board.print_board();
-    board.move_vertical(false);
-    board.print_board();
-    board.move_vertical(true);
+    board.move_right();
     board.print_board();
 }
 
@@ -57,93 +56,39 @@ impl BoardData {
         }
     }
 
-    fn move_horizontal(&mut self, right: bool) {
+    fn move_right(&mut self) {
         for y in 0..4 {
-            let mut empty_spots: VecDeque<usize> = VecDeque::new();
-            let mut last_block_index: Option<usize> = if right { Some(3) } else { Some(0) };
-
-            let range: Vec<usize> = if right {
-                (0..4).rev().collect()
-            } else {
-                (0..4).collect()
-            };
-
-            for x in range {
+            for x in (0..4).rev() {
                 if self.board[x][y] == 0 {
-                    empty_spots.push_back(x);
                     continue;
                 }
 
-                if let Some(last_x) = last_block_index {
-                    if self.board[x][y] == self.board[last_x][y] && x != last_x {
-                        self.board[last_x][y] *= 2;
-                        self.board[x][y] = 0;
+                let mut block_x = x;
+                for x2 in (x + 1)..4 {
+                    if self.board[x2][y] == 0 {
+                        self.board[x2][y] = self.board[block_x][y];
+                        self.board[block_x][y] = 0;
+                        block_x = x2;
 
-                        empty_spots.push_front(x);
-                        last_block_index = None;
                         continue;
                     }
                 }
-                last_block_index = Some(x);
 
-                if let Some(empty_x) = empty_spots.pop_front() {
-                    self.board[empty_x][y] = self.board[x][y];
-                    self.board[x][y] = 0;
+                for combine_x in (0..block_x).rev() {
+                    if self.board[combine_x][y] == 0 {
+                        continue;
+                    }
 
-                    empty_spots.push_front(x);
-                    last_block_index = Some(empty_x);
+                    if self.board[combine_x][y] != self.board[block_x][y] {
+                        break;
+                    }
+
+                    self.board[combine_x][y] = 0;
+                    self.board[block_x][y] *= 2;
                 }
 
-                println!("empty spots: {:?}, lbi: {:?}, y{}", empty_spots, last_block_index, y);
                 self.print_board();
             }
         }
-
-        self.add_random_tile();
-    }
-
-    fn move_vertical(&mut self, down: bool) {
-        for x in 0..4 {
-            let mut empty_spots: VecDeque<usize> = VecDeque::new();
-            let mut last_block_index: Option<usize> = if down { Some(3) } else { Some(0) };
-
-            let range: Vec<usize> = if down {
-                (0..4).rev().collect()
-            } else {
-                (0..4).collect()
-            };
-
-            for y in range {
-                if self.board[x][y] == 0 {
-                    empty_spots.push_back(y);
-                    continue;
-                }
-
-                if let Some(last_y) = last_block_index {
-                    if self.board[x][y] == self.board[x][last_y] && y != last_y {
-                        self.board[x][last_y] *= 2;
-                        self.board[x][y] = 0;
-
-                        empty_spots.push_front(y);
-                        last_block_index = None;
-                        continue;
-                    }
-                }
-                last_block_index = Some(y);
-
-                if let Some(empty_y) = empty_spots.pop_front() {
-                    self.board[x][empty_y] = self.board[x][y];
-                    self.board[x][y] = 0;
-
-                    empty_spots.push_front(y);
-                    last_block_index = Some(empty_y);
-                }
-            }
-
-            println!("empty spots: {:?}, lbi: {:?}, x{}", empty_spots, last_block_index, x);
-            self.print_board();
-        }
-
-        self.add_random_tile();
     }
 }

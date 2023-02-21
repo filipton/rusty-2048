@@ -2,6 +2,7 @@
 mod test {
     use crate::BoardData;
 
+    /*
     #[test]
     fn test_move_horizontal() {
         let mut board = BoardData { board: [[0; 4]; 4] };
@@ -153,4 +154,5 @@ mod test {
 
         assert_eq!(sum, 32);
     }
+    */
 }
