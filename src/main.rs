@@ -4,6 +4,7 @@ use crossterm::{
     event::{self, Event, KeyCode},
     execute, terminal,
 };
+use utils::clear_console;
 
 mod board;
 mod tests;
@@ -26,6 +27,11 @@ fn main() -> Result<()> {
     let mut board = BoardData::new();
 
     loop {
+        if board.lost {
+            break;
+        }
+
+        clear_console();
         board.print_board();
 
         if let Event::Key(event) = event::read().expect("Error") {

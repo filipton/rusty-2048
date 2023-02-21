@@ -4,11 +4,17 @@ use crate::utils::write;
 
 pub struct BoardData {
     pub board: [[u64; 4]; 4],
+    pub lost: bool,
+    pub debug: bool,
 }
 
 impl BoardData {
     pub fn new() -> BoardData {
-        let mut b_data = BoardData { board: [[0; 4]; 4] };
+        let mut b_data = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: false,
+        };
         b_data.add_random_tile_count(2);
 
         return b_data;
@@ -17,15 +23,32 @@ impl BoardData {
     pub fn print_board(&self) {
         for y in 0..4 {
             for x in 0..4 {
-                write(format!("{} ", self.board[x][y]));
+                print!("{} ", self.board[x][y]);
             }
-            write(format!("\r\n"));
+            println!("\r");
         }
 
-        write(format!("\r\n"));
+        println!("\r");
+    }
+
+    pub fn check_empty(&self) -> bool {
+        for y in 0..4 {
+            for x in 0..4 {
+                if self.board[x][y] == 0 {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     pub fn add_random_tile(&mut self) {
+        if !self.check_empty() {
+            self.lost = true;
+            return;
+        }
+
         let mut rng = rand::thread_rng();
         let mut x = rng.gen_range(0..4);
         let mut y = rng.gen_range(0..4);
@@ -76,7 +99,9 @@ impl BoardData {
             }
         }
 
-        self.add_random_tile();
+        if !self.debug {
+            self.add_random_tile();
+        }
     }
 
     pub fn move_left(&mut self) {
@@ -111,7 +136,9 @@ impl BoardData {
             }
         }
 
-        self.add_random_tile();
+        if !self.debug {
+            self.add_random_tile();
+        }
     }
 
     pub fn move_up(&mut self) {
@@ -146,7 +173,9 @@ impl BoardData {
             }
         }
 
-        self.add_random_tile();
+        if !self.debug {
+            self.add_random_tile();
+        }
     }
 
     pub fn move_down(&mut self) {
@@ -181,6 +210,8 @@ impl BoardData {
             }
         }
 
-        self.add_random_tile();
+        if !self.debug {
+            self.add_random_tile();
+        }
     }
 }

@@ -4,7 +4,11 @@ mod test {
 
     #[test]
     fn test_move_horizontal() {
-        let mut board = BoardData { board: [[0; 4]; 4] };
+        let mut board = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: true,
+        };
         board.board[0][0] = 2;
         board.board[1][0] = 2;
         board.board[2][0] = 2;
@@ -30,7 +34,11 @@ mod test {
 
     #[test]
     fn test_move_horizontal_2() {
-        let mut board = BoardData { board: [[0; 4]; 4] };
+        let mut board = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: true,
+        };
         board.board[0][0] = 2;
         board.board[1][0] = 0;
         board.board[2][0] = 2;
@@ -56,7 +64,11 @@ mod test {
 
     #[test]
     fn test_move_vertical() {
-        let mut board = BoardData { board: [[0; 4]; 4] };
+        let mut board = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: true,
+        };
         board.board[0][0] = 2;
         board.board[0][1] = 2;
         board.board[0][2] = 2;
@@ -82,7 +94,11 @@ mod test {
 
     #[test]
     fn test_move_vertical_2() {
-        let mut board = BoardData { board: [[0; 4]; 4] };
+        let mut board = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: true,
+        };
         board.board[0][0] = 2;
         board.board[0][1] = 0;
         board.board[0][2] = 2;
@@ -108,7 +124,11 @@ mod test {
 
     #[test]
     fn test_move_horizontal_vertical() {
-        let mut board = BoardData { board: [[0; 4]; 4] };
+        let mut board = BoardData {
+            board: [[0; 4]; 4],
+            lost: false,
+            debug: true,
+        };
         board.board[0][0] = 2;
         board.board[1][0] = 2;
         board.board[2][0] = 2;
