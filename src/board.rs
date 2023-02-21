@@ -22,16 +22,21 @@ impl BoardData {
     }
 
     pub fn print_board(&self) {
+        println!("{}\r", "=".repeat(33));
+
         for y in 0..4 {
+            print!("\r\n");
             for x in 0..4 {
+                print!("|");
                 // print!("{: ^6}", self.board[x][y]);
                 print_formatted(
-                    format!("{: ^6}", self.board[x][y]),
+                    format!("{: ^7}", self.board[x][y]),
                     get_block_color(self.board[x][y]),
                     Color::Reset,
                 )
             }
-            println!("\n\r");
+
+            println!("|\r\n\r\n{}\r", "=".repeat(33));
         }
 
         println!("\r");
@@ -224,6 +229,7 @@ impl BoardData {
 
 pub fn get_block_color(value: u64) -> Color {
     match value {
+        0 => Color::Rgb { r: 0, g: 0, b: 0 },
         2 => Color::Rgb {
             r: 238,
             g: 228,
