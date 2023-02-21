@@ -1,200 +1,59 @@
-use rand::Rng;
-use std::{borrow::Borrow, collections::VecDeque};
+use anyhow::Result;
+use board::BoardData;
+use crossterm::{
+    event::{self, Event, KeyCode},
+    execute, terminal,
+};
 
+mod board;
 mod tests;
+mod utils;
 
-fn main() {
-    let mut board = BoardData { board: [[0; 4]; 4] };
-    board.board[0][0] = 2;
-    board.board[1][0] = 2;
-    board.board[2][0] = 2;
-    board.board[3][0] = 2;
-    board.board[0][1] = 2;
-    board.board[0][2] = 2;
-    board.board[0][3] = 2;
-
-    board.print_board();
-    board.move_right();
-    board.print_board();
-    board.move_left();
-    board.print_board();
-
-    board.move_up();
-    board.print_board();
-    board.move_down();
-    board.print_board();
+pub struct CleanUp;
+impl Drop for CleanUp {
+    fn drop(&mut self) {
+        terminal::disable_raw_mode().expect("Unable to disable raw mode");
+        execute!(std::io::stdout(), terminal::LeaveAlternateScreen)
+            .expect("Unable to leave alternate screen");
+    }
 }
 
-struct BoardData {
-    board: [[u64; 4]; 4],
-}
+fn main() -> Result<()> {
+    let _clean_up = CleanUp;
+    terminal::enable_raw_mode()?;
+    execute!(std::io::stdout(), terminal::EnterAlternateScreen)?;
 
-impl BoardData {
-    fn new() -> BoardData {
-        let mut b_data = BoardData { board: [[0; 4]; 4] };
-        b_data.add_random_tile_count(2);
+    let mut board = BoardData::new();
 
-        return b_data;
-    }
+    loop {
+        board.print_board();
 
-    fn print_board(&self) {
-        for y in 0..4 {
-            for x in 0..4 {
-                print!("{} ", self.board[x][y]);
-            }
-            println!("");
-        }
-        println!("");
-    }
-
-    fn add_random_tile(&mut self) {
-        let mut rng = rand::thread_rng();
-        let mut x = rng.gen_range(0..4);
-        let mut y = rng.gen_range(0..4);
-        while self.board[x][y] != 0 {
-            x = rng.gen_range(0..4);
-            y = rng.gen_range(0..4);
-        }
-
-        let tile_value = if rng.gen_range(0..10) < 2 { 4 } else { 2 };
-        self.board[x][y] = tile_value;
-    }
-
-    fn add_random_tile_count(&mut self, count: usize) {
-        for _ in 0..count {
-            self.add_random_tile();
-        }
-    }
-
-    fn move_right(&mut self) {
-        for y in 0..4 {
-            for x in (0..4).rev() {
-                if self.board[x][y] == 0 {
-                    continue;
+        if let Event::Key(event) = event::read().expect("Error") {
+            // menu selector logic
+            match event.code {
+                KeyCode::Up | KeyCode::Char('k') => {
+                    board.move_up();
                 }
-
-                let mut block_x = x;
-                for x2 in (x + 1)..4 {
-                    if self.board[x2][y] == 0 {
-                        self.board[x2][y] = self.board[block_x][y];
-                        self.board[block_x][y] = 0;
-                        block_x = x2;
-
-                        continue;
-                    }
+                KeyCode::Down | KeyCode::Char('j') => {
+                    board.move_down();
                 }
-
-                for combine_x in (0..block_x).rev() {
-                    if self.board[combine_x][y] == 0 {
-                        continue;
-                    }
-                    if self.board[combine_x][y] != self.board[block_x][y] {
+                KeyCode::Left | KeyCode::Char('h') => {
+                    board.move_left();
+                }
+                KeyCode::Right | KeyCode::Char('l') => {
+                    board.move_right();
+                }
+                KeyCode::Char('q') => break,
+                KeyCode::Char('c') => {
+                    if event.modifiers.contains(event::KeyModifiers::CONTROL) {
                         break;
                     }
-
-                    self.board[combine_x][y] = 0;
-                    self.board[block_x][y] *= 2;
                 }
+                _ => continue,
             }
         }
     }
 
-    fn move_left(&mut self) {
-        for y in 0..4 {
-            for x in 0..4 {
-                if self.board[x][y] == 0 {
-                    continue;
-                }
-
-                let mut block_x = x;
-                for x2 in (0..x).rev() {
-                    if self.board[x2][y] == 0 {
-                        self.board[x2][y] = self.board[block_x][y];
-                        self.board[block_x][y] = 0;
-                        block_x = x2;
-
-                        continue;
-                    }
-                }
-
-                for combine_x in block_x + 1..4 {
-                    if self.board[combine_x][y] == 0 {
-                        continue;
-                    }
-                    if self.board[combine_x][y] != self.board[block_x][y] {
-                        break;
-                    }
-
-                    self.board[combine_x][y] = 0;
-                    self.board[block_x][y] *= 2;
-                }
-            }
-        }
-    }
-
-    fn move_up(&mut self) {
-        for x in 0..4 {
-            for y in 0..4 {
-                if self.board[x][y] == 0 {
-                    continue;
-                }
-
-                let mut block_y = y;
-                for y2 in (0..y).rev() {
-                    if self.board[x][y2] == 0 {
-                        self.board[x][y2] = self.board[x][block_y];
-                        self.board[x][block_y] = 0;
-                        block_y = y2;
-
-                        continue;
-                    }
-                }
-
-                for combine_y in block_y + 1..4 {
-                    if self.board[x][combine_y] == 0 {
-                        continue;
-                    }
-                    if self.board[x][combine_y] != self.board[x][block_y] {
-                        break;
-                    }
-
-                    self.board[x][combine_y] = 0;
-                    self.board[x][block_y] *= 2;
-                }
-            }
-        }
-    }
-
-    fn move_down(&mut self) {
-        for x in 0..4 {
-            for y in (0..4).rev() {
-                if self.board[x][y] == 0 {
-                    continue;
-                }
-
-                let mut block_y = y;
-                for y2 in (y + 1)..4 {
-                    if self.board[x][y2] == 0 {
-                        self.board[x][y2] = self.board[x][block_y];
-                        self.board[x][block_y] = 0;
-                        block_y = y2;
-
-                        continue;
-                    }
-                }
-
-                for combine_y in (0..block_y).rev() {
-                    if self.board[x][combine_y] == 0 {
-                        continue;
-                    }
-                    if self.board[x][combine_y] != self.board[x][block_y] {
-                        break;
-                    }
-
-                    self.board[x][combine_y] = 0;
-                    self.board[x][block_y] *= 2;
-                }
-            }
-        }
-    }
+    drop(_clean_up);
+    Ok(())
 }

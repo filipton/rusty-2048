@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use crate::BoardData;
+    use crate::board::BoardData;
 
     #[test]
     fn test_move_horizontal() {
