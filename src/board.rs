@@ -1,6 +1,7 @@
+use crossterm::style::Color;
 use rand::Rng;
 
-use crate::utils::write;
+use crate::utils::{print_formatted, write};
 
 pub struct BoardData {
     pub board: [[u64; 4]; 4],
@@ -23,9 +24,14 @@ impl BoardData {
     pub fn print_board(&self) {
         for y in 0..4 {
             for x in 0..4 {
-                print!("{} ", self.board[x][y]);
+                // print!("{: ^6}", self.board[x][y]);
+                print_formatted(
+                    format!("{: ^6}", self.board[x][y]),
+                    get_block_color(self.board[x][y]),
+                    Color::Reset,
+                )
             }
-            println!("\r");
+            println!("\n\r");
         }
 
         println!("\r");
@@ -213,5 +219,66 @@ impl BoardData {
         if !self.debug {
             self.add_random_tile();
         }
+    }
+}
+
+pub fn get_block_color(value: u64) -> Color {
+    match value {
+        2 => Color::Rgb {
+            r: 238,
+            g: 228,
+            b: 218,
+        },
+        4 => Color::Rgb {
+            r: 237,
+            g: 224,
+            b: 200,
+        },
+        8 => Color::Rgb {
+            r: 242,
+            g: 177,
+            b: 121,
+        },
+        16 => Color::Rgb {
+            r: 245,
+            g: 149,
+            b: 99,
+        },
+        32 => Color::Rgb {
+            r: 246,
+            g: 124,
+            b: 95,
+        },
+        64 => Color::Rgb {
+            r: 246,
+            g: 94,
+            b: 59,
+        },
+        128 => Color::Rgb {
+            r: 237,
+            g: 207,
+            b: 114,
+        },
+        256 => Color::Rgb {
+            r: 237,
+            g: 204,
+            b: 97,
+        },
+        512 => Color::Rgb {
+            r: 237,
+            g: 200,
+            b: 80,
+        },
+        1024 => Color::Rgb {
+            r: 237,
+            g: 197,
+            b: 63,
+        },
+        2048 => Color::Rgb {
+            r: 237,
+            g: 194,
+            b: 46,
+        },
+        _ => Color::Reset,
     }
 }
