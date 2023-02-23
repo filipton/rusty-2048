@@ -1,5 +1,5 @@
 [package]
-name = "ttfe"
+name = "rusty-2048"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.69"
 crossterm = "0.26.0"
+matrix_display = "1.0.0"
 rand = "0.8.5"

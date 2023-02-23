@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "ansi_term"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee49baf6cb617b853aa8d93bf420db2383fab46d314482ca2803b40d5fde979b"
+dependencies = [
+ "winapi",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -88,6 +97,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "matrix_display"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6e1016e698127fd63673a02027597c04ca820909c0f7ccaf5d86f1a5176f7fd"
+dependencies = [
+ "ansi_term",
+ "unicode-width",
+ "unicode_types",
+]
+
+[[package]]
 name = "mio"
 version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -168,6 +188,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusty-2048"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "crossterm",
+ "matrix_display",
+ "rand",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -210,12 +240,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
-name = "ttfe"
+name = "string_morph"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "183aaf7fa637cc7b5f54c45b8f7cb6e8d73831f9f75a56b6defa5bf8c51d1699"
+
+[[package]]
+name = "unicode-width"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0edd1e5b14653f783770bce4a4dabb4a5108a5370a5f5d8cfe8710c361f6c8b"
+
+[[package]]
+name = "unicode_types"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ad5cf130d9596c1a6a1b2b4b400753ff26b725534f33a7b431f1b798f9726ae"
 dependencies = [
- "anyhow",
- "crossterm",
- "rand",
+ "string_morph",
 ]
 
 [[package]]
