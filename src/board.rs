@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use crossterm::style::Color;
+use matrix_display::*;
 use rand::Rng;
 
 use crate::utils::{print_formatted, write};
@@ -22,24 +25,40 @@ impl BoardData {
     }
 
     pub fn print_board(&self) {
-        println!("{}\r", "=".repeat(33));
+        let format = Format::new(7, 3);
+        let color_theme: HashMap<u64, u8> = HashMap::from([
+            (0, 247),
+            (2, 78),
+            (4, 222),
+            (8, 220),
+            (16, 214),
+            (32, 208),
+            (64, 202),
+            (128, 196),
+            (256, 162),
+            (512, 160),
+            (1024, 126),
+            (2048, 90),
+            (4096, 88),
+            (8192, 54),
+            (16384, 53),
+            (32768, 52),
+        ]);
 
-        for y in 0..4 {
-            print!("\r\n");
-            for x in 0..4 {
-                print!("|");
-                // print!("{: ^6}", self.board[x][y]);
-                print_formatted(
-                    format!("{: ^7}", self.board[x][y]),
-                    get_block_color(self.board[x][y]),
-                    Color::Reset,
-                )
+        let mut board_matrix: Vec<_> = Vec::new();
+        for x in 0..4 {
+            for y in 0..4 {
+                board_matrix.push(cell::Cell::new(
+                    parse_text(self.board[y][x]),
+                    0,
+                    *color_theme.get(&self.board[y][x]).unwrap_or(&0u8),
+                ))
             }
-
-            println!("|\r\n\r\n{}\r", "=".repeat(33));
         }
 
-        println!("\r");
+        let mut data = matrix::Matrix::new(4, board_matrix);
+        let display = MatrixDisplay::new(&format, &mut data);
+        display.print(&mut std::io::stdout(), &style::BordersStyle::ArcLight);
     }
 
     pub fn check_empty(&self) -> bool {
@@ -227,64 +246,10 @@ impl BoardData {
     }
 }
 
-pub fn get_block_color(value: u64) -> Color {
-    match value {
-        0 => Color::Rgb { r: 0, g: 0, b: 0 },
-        2 => Color::Rgb {
-            r: 238,
-            g: 228,
-            b: 218,
-        },
-        4 => Color::Rgb {
-            r: 237,
-            g: 224,
-            b: 200,
-        },
-        8 => Color::Rgb {
-            r: 242,
-            g: 177,
-            b: 121,
-        },
-        16 => Color::Rgb {
-            r: 245,
-            g: 149,
-            b: 99,
-        },
-        32 => Color::Rgb {
-            r: 246,
-            g: 124,
-            b: 95,
-        },
-        64 => Color::Rgb {
-            r: 246,
-            g: 94,
-            b: 59,
-        },
-        128 => Color::Rgb {
-            r: 237,
-            g: 207,
-            b: 114,
-        },
-        256 => Color::Rgb {
-            r: 237,
-            g: 204,
-            b: 97,
-        },
-        512 => Color::Rgb {
-            r: 237,
-            g: 200,
-            b: 80,
-        },
-        1024 => Color::Rgb {
-            r: 237,
-            g: 197,
-            b: 63,
-        },
-        2048 => Color::Rgb {
-            r: 237,
-            g: 194,
-            b: 46,
-        },
-        _ => Color::Reset,
+pub fn parse_text(input: u64) -> String {
+    if input > 0 {
+        return format!("{}", input);
     }
+
+    return format!("");
 }

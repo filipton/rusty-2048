@@ -4,7 +4,6 @@ use crossterm::{
     event::{self, Event, KeyCode},
     execute, terminal,
 };
-use matrix_display::*;
 use utils::clear_console;
 
 mod board;
@@ -33,27 +32,7 @@ fn main() -> Result<()> {
         }
 
         clear_console();
-        //board.print_board();
-
-        let format = Format::new(7, 3);
-
-        let colour_theme = vec![
-            247, 78, 222, 220, 214, 208, 202, 196, 162, 160, 126, 90, 88, 54, 53, 52,
-        ];
-        let board_matrix = (0..16)
-            .map(|x| {
-                cell::Cell::new(
-                    2_f64.powi(x + 1),
-                    7,
-                    *colour_theme.get(x as usize).unwrap() as u8,
-                )
-            })
-            .collect::<Vec<_>>();
-
-        let mut data = matrix::Matrix::new(4, board_matrix);
-        let mut display = MatrixDisplay::new(&format, &mut data);
-        //display.cell_at_cursor_position((1, 1)).color.bg = 226;
-        display.print(&mut std::io::stdout(), &style::BordersStyle::None);
+        board.print_board();
 
         if let Event::Key(event) = event::read().expect("Error") {
             // menu selector logic
