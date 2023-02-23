@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use crossterm::style::Color;
 use matrix_display::*;
 use rand::Rng;
 
@@ -10,6 +9,19 @@ pub struct BoardData {
     pub board: [[u64; 4]; 4],
     pub lost: bool,
     pub debug: bool,
+}
+
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+pub enum GameStatus {
+    Playing,
+    Won,
+    Lost,
 }
 
 impl BoardData {
@@ -97,6 +109,17 @@ impl BoardData {
         }
     }
 
+    pub fn do_move(&mut self, dir: Direction) -> GameStatus {
+        match dir {
+            Direction::Up => self.move_up(),
+            Direction::Down => self.move_down(),
+            Direction::Left => self.move_left(),
+            Direction::Right => self.move_right(),
+        }
+
+        return GameStatus::Playing;
+    }
+
     pub fn move_right(&mut self) {
         for y in 0..4 {
             for x in (0..4).rev() {
@@ -104,28 +127,8 @@ impl BoardData {
                     continue;
                 }
 
-                let mut block_x = x;
-                for x2 in (x + 1)..4 {
-                    if self.board[x2][y] == 0 {
-                        self.board[x2][y] = self.board[block_x][y];
-                        self.board[block_x][y] = 0;
-                        block_x = x2;
-
-                        continue;
-                    }
-                }
-
-                for combine_x in (0..block_x).rev() {
-                    if self.board[combine_x][y] == 0 {
-                        continue;
-                    }
-                    if self.board[combine_x][y] != self.board[block_x][y] {
-                        break;
-                    }
-
-                    self.board[combine_x][y] = 0;
-                    self.board[block_x][y] *= 2;
-                }
+                let block_x = self.move_x_blocks(x, y);
+                self.combine_x_blocks(block_x, y);
             }
         }
 
@@ -141,28 +144,8 @@ impl BoardData {
                     continue;
                 }
 
-                let mut block_x = x;
-                for x2 in (0..x).rev() {
-                    if self.board[x2][y] == 0 {
-                        self.board[x2][y] = self.board[block_x][y];
-                        self.board[block_x][y] = 0;
-                        block_x = x2;
-
-                        continue;
-                    }
-                }
-
-                for combine_x in block_x + 1..4 {
-                    if self.board[combine_x][y] == 0 {
-                        continue;
-                    }
-                    if self.board[combine_x][y] != self.board[block_x][y] {
-                        break;
-                    }
-
-                    self.board[combine_x][y] = 0;
-                    self.board[block_x][y] *= 2;
-                }
+                let block_x = self.move_x_blocks(x, y);
+                self.combine_x_blocks(block_x, y);
             }
         }
 
@@ -242,6 +225,35 @@ impl BoardData {
 
         if !self.debug {
             self.add_random_tile();
+        }
+    }
+
+    fn move_x_blocks(&mut self, x: usize, y: usize) -> usize {
+        let mut block_x = x;
+        for x2 in (x + 1)..4 {
+            if self.board[x2][y] == 0 {
+                self.board[x2][y] = self.board[block_x][y];
+                self.board[block_x][y] = 0;
+                block_x = x2;
+
+                continue;
+            }
+        }
+
+        return block_x;
+    }
+
+    fn combine_x_blocks(&mut self, block_x: usize, y: usize) {
+        for combine_x in block_x + 1..4 {
+            if self.board[combine_x][y] == 0 {
+                continue;
+            }
+            if self.board[combine_x][y] != self.board[block_x][y] {
+                break;
+            }
+
+            self.board[combine_x][y] = 0;
+            self.board[block_x][y] *= 2;
         }
     }
 }
