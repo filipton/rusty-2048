@@ -7,8 +7,7 @@ use crate::utils::{print_formatted, write};
 
 pub struct BoardData {
     pub board: [[u64; 4]; 4],
-    pub lost: bool,
-    pub debug: bool,
+    pub state: GameStatus,
 }
 
 pub enum Direction {
@@ -28,8 +27,7 @@ impl BoardData {
     pub fn new() -> BoardData {
         let mut b_data = BoardData {
             board: [[0; 4]; 4],
-            lost: false,
-            debug: false,
+            state: GameStatus::Playing,
         };
         b_data.add_random_tile_count(2);
 
@@ -87,7 +85,7 @@ impl BoardData {
 
     pub fn add_random_tile(&mut self) {
         if !self.check_empty() {
-            self.lost = true;
+            self.state = GameStatus::Lost;
             return;
         }
 
@@ -109,12 +107,16 @@ impl BoardData {
         }
     }
 
-    pub fn do_move(&mut self, dir: Direction) -> GameStatus {
+    pub fn do_move(&mut self, dir: Direction, wo_tile: bool) -> GameStatus {
         match dir {
             Direction::Up => self.move_up(),
             Direction::Down => self.move_down(),
             Direction::Left => self.move_left(),
             Direction::Right => self.move_right(),
+        }
+
+        if !wo_tile {
+            self.add_random_tile();
         }
 
         return GameStatus::Playing;
@@ -127,30 +129,62 @@ impl BoardData {
                     continue;
                 }
 
-                let block_x = self.move_x_blocks(x, y);
-                self.combine_x_blocks(block_x, y);
-            }
-        }
+                let mut block_x = x;
+                for x2 in (x + 1)..4 {
+                    if self.board[x2][y] == 0 {
+                        self.board[x2][y] = self.board[block_x][y];
+                        self.board[block_x][y] = 0;
+                        block_x = x2;
 
-        if !self.debug {
-            self.add_random_tile();
+                        continue;
+                    }
+                }
+
+                for combine_x in (0..block_x).rev() {
+                    if self.board[combine_x][y] == 0 {
+                        continue;
+                    }
+                    if self.board[combine_x][y] != self.board[block_x][y] {
+                        break;
+                    }
+
+                    self.board[combine_x][y] = 0;
+                    self.board[block_x][y] *= 2;
+                }
+            }
         }
     }
 
     pub fn move_left(&mut self) {
-        for y in 0..4 {
+       for y in 0..4 {
             for x in 0..4 {
                 if self.board[x][y] == 0 {
                     continue;
                 }
 
-                let block_x = self.move_x_blocks(x, y);
-                self.combine_x_blocks(block_x, y);
-            }
-        }
+                let mut block_x = x;
+                for x2 in (0..x).rev() {
+                    if self.board[x2][y] == 0 {
+                        self.board[x2][y] = self.board[block_x][y];
+                        self.board[block_x][y] = 0;
+                        block_x = x2;
 
-        if !self.debug {
-            self.add_random_tile();
+                        continue;
+                    }
+                }
+
+                for combine_x in block_x + 1..4 {
+                    if self.board[combine_x][y] == 0 {
+                        continue;
+                    }
+                    if self.board[combine_x][y] != self.board[block_x][y] {
+                        break;
+                    }
+
+                    self.board[combine_x][y] = 0;
+                    self.board[block_x][y] *= 2;
+                }
+            }
         }
     }
 
@@ -185,10 +219,6 @@ impl BoardData {
                 }
             }
         }
-
-        if !self.debug {
-            self.add_random_tile();
-        }
     }
 
     pub fn move_down(&mut self) {
@@ -221,39 +251,6 @@ impl BoardData {
                     self.board[x][block_y] *= 2;
                 }
             }
-        }
-
-        if !self.debug {
-            self.add_random_tile();
-        }
-    }
-
-    fn move_x_blocks(&mut self, x: usize, y: usize) -> usize {
-        let mut block_x = x;
-        for x2 in (x + 1)..4 {
-            if self.board[x2][y] == 0 {
-                self.board[x2][y] = self.board[block_x][y];
-                self.board[block_x][y] = 0;
-                block_x = x2;
-
-                continue;
-            }
-        }
-
-        return block_x;
-    }
-
-    fn combine_x_blocks(&mut self, block_x: usize, y: usize) {
-        for combine_x in block_x + 1..4 {
-            if self.board[combine_x][y] == 0 {
-                continue;
-            }
-            if self.board[combine_x][y] != self.board[block_x][y] {
-                break;
-            }
-
-            self.board[combine_x][y] = 0;
-            self.board[block_x][y] *= 2;
         }
     }
 }
