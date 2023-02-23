@@ -21,29 +21,6 @@ impl Drop for CleanUp {
 }
 
 fn main() -> Result<()> {
-    let format = Format::new(7, 3);
-    let board = vec![
-        2048, 4096, 0,
-        16000, 2, 256
-    ]
-    .iter()
-    .enumerate()
-    .map(|(i, x)| {
-        let ansi_fg = 33;
-        let mut ansi_bg = 0;
-        if i % 2 + (i / 8) % 2 == 1 {
-            ansi_bg = 7;
-        }
-        cell::Cell::new(x.clone(), ansi_fg, ansi_bg)
-    })
-    .collect::<Vec<_>>();
-    let mut data = matrix::Matrix::new(3, board);
-    let mut display = MatrixDisplay::new(&format, &mut data);
-    //display.cell_at_cursor_position((13, 6)).color.bg = 10;
-    display.print(&mut std::io::stdout(), &style::BordersStyle::None);
-
-    return Ok(());
-
     let _clean_up = CleanUp;
     terminal::enable_raw_mode()?;
     execute!(std::io::stdout(), terminal::EnterAlternateScreen)?;
@@ -56,7 +33,27 @@ fn main() -> Result<()> {
         }
 
         clear_console();
-        board.print_board();
+        //board.print_board();
+
+        let format = Format::new(7, 3);
+
+        let colour_theme = vec![
+            247, 78, 222, 220, 214, 208, 202, 196, 162, 160, 126, 90, 88, 54, 53, 52,
+        ];
+        let board_matrix = (0..16)
+            .map(|x| {
+                cell::Cell::new(
+                    2_f64.powi(x + 1),
+                    7,
+                    *colour_theme.get(x as usize).unwrap() as u8,
+                )
+            })
+            .collect::<Vec<_>>();
+
+        let mut data = matrix::Matrix::new(4, board_matrix);
+        let mut display = MatrixDisplay::new(&format, &mut data);
+        //display.cell_at_cursor_position((1, 1)).color.bg = 226;
+        display.print(&mut std::io::stdout(), &style::BordersStyle::None);
 
         if let Event::Key(event) = event::read().expect("Error") {
             // menu selector logic
